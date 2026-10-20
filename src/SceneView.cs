@@ -44,6 +44,7 @@ internal sealed class SceneView : FrameworkElement
 
     private void DrawMousePadAndMouse(DrawingContext d)
     {
+        d.PushTransform(new TranslateTransform(40, -28));
         // 鼠标垫采用倾斜四边形
         DrawQuad(d, "#F7D6CF", "#8A6A64",
             new Point(101, 183),
@@ -77,6 +78,7 @@ internal sealed class SceneView : FrameworkElement
         if (!MouseLeft && !MouseRight && MousePulse > 0.05)
             Ellipse(d, "#18D9A8A0", null,
                 mx, my + 12, 12, 5);
+        d.Pop();
     }
 
     private void DrawKeyboard(DrawingContext d)
