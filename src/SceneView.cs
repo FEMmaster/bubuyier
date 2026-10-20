@@ -42,7 +42,7 @@ internal sealed class SceneView : FrameworkElement
         DrawShadows(d);
         
         // 后景：人物
-        d.DrawImage(BubuImage, new Rect(82, 48, 122, 125));
+        d.DrawImage(BubuImage, new Rect(137, 48, 122, 125));
         d.DrawImage(YierImage, new Rect(314, 86, 148, 151));
         
         // 中景：鼠标和键盘整体绕画面中心顺时针旋转30°
