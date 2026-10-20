@@ -40,13 +40,20 @@ internal sealed class SceneView : FrameworkElement
         d.PushTransform(new ScaleTransform(ActualWidth / BaseW, ActualHeight / BaseH));
         
         DrawShadows(d);
-        // Character PNGs are behind the foreground desk devices.
-        // The original character paws are part of the image in this preview.
+        
+        // 后景：人物
         d.DrawImage(BubuImage, new Rect(82, 48, 122, 125));
         d.DrawImage(YierImage, new Rect(314, 86, 148, 151));
+        
+        // 中景：鼠标和键盘整体绕画面中心顺时针旋转30°
+        d.PushTransform(new RotateTransform(30, BaseW / 2, BaseH / 2));
         DrawMousePadAndMouse(d);
         DrawKeyboard(d);
+        d.Pop();
+        
+        // 前景：桌面边缘线
         DrawDeskFrame(d);
+        
         d.Pop();
     }
 
