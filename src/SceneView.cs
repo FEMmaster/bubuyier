@@ -44,49 +44,59 @@ internal sealed class SceneView : FrameworkElement
 
     private void DrawMousePadAndMouse(DrawingContext d)
     {
-        // 将鼠标和鼠标垫整体旋转180°，朝向布布
-        d.PushTransform(new RotateTransform(180, 131, 201));
+        // 鼠标垫采用倾斜四边形
+        DrawQuad(d, "#F7D6CF", "#8A6A64",
+            new Point(101, 183),
+            new Point(158, 194),
+            new Point(178, 224),
+            new Point(77, 211));
     
-        RoundRect(d, "#F7D6CF", "#8A6A64",
-            88, 182, 86, 41, 10, 1.8);
+        double mx = 127 + Math.Clamp(MouseX, -1, 1) * 5;
+        double my = 203 + Math.Clamp(MouseY, -1, 1) * 2;
     
-        double mx = 131 + Math.Clamp(MouseX, -1, 1) * 5.5;
-        double my = 201 + Math.Clamp(MouseY, -1, 1) * 2.0;
+        // 鼠标跟随桌面方向倾斜
+        d.PushTransform(new RotateTransform(35, mx, my));
     
         Ellipse(d, "#FFF9F4", "#866B64",
-            mx, my, 23, 31, 2.0);
+            mx, my, 16, 25, 2);
     
+        // 鼠标前端朝向布布
         Line(d, "#8A6F68", 1.4,
-            mx, my - 23, mx, my + 1);
+            mx, my + 19, mx, my - 1);
     
         if (MouseLeft)
             Ellipse(d, "#F1BBB2", null,
-                mx - 8, my - 5, 8, 10);
+                mx - 6, my + 8, 6, 8);
     
         if (MouseRight)
             Ellipse(d, "#F1BBB2", null,
-                mx + 8, my - 5, 8, 10);
+                mx + 6, my + 8, 6, 8);
+    
+        d.Pop();
     
         if (!MouseLeft && !MouseRight && MousePulse > 0.05)
             Ellipse(d, "#18D9A8A0", null,
-                mx, my + 11,
-                14 + 5 * MousePulse,
-                6 + 2 * MousePulse);
-    
-        d.Pop();
+                mx, my + 12, 12, 5);
     }
 
     private void DrawKeyboard(DrawingContext d)
     {
-        // 绕键盘中心旋转180°
-        // 键盘、键帽、按键高亮同步旋转
-        d.PushTransform(new RotateTransform(180, 340, 208));
+        // 斜视键盘：远端较短，近端较宽
+        Point farLeft = new(260, 169);
+        Point farRight = new(430, 185);
+        Point nearRight = new(456, 239);
+        Point nearLeft = new(228, 218);
     
-        RoundRect(d, "#F8F1E7", "#8D8177",
-            226, 167, 228, 82, 15, 2.0);
+        // 键盘侧面厚度
+        DrawQuad(d, "#DCCABB", "#8D8177",
+            nearLeft,
+            nearRight,
+            new Point(456, 247),
+            new Point(228, 226));
     
-        RoundRect(d, "#EFE5DA", null,
-            233, 172, 214, 69, 13, 0);
+        // 键盘顶面
+        DrawQuad(d, "#F8F1E7", "#8D8177",
+            farLeft, farRight, nearRight, nearLeft);
     
         foreach (var k in KeyboardLayout.Keys)
         {
@@ -95,37 +105,52 @@ internal sealed class SceneView : FrameworkElement
                 (k.Vk == 160 && HeldKeys.Contains(16)) ||
                 (k.Vk == 161 && HeldKeys.Contains(16));
     
-            double y = k.Y + (held ? 1.8 : 0);
+            // 保留上次的180度方向调整
+            double u0 = Math.Clamp(
+                (445 - k.X - k.W) / 207.0, 0, 1);
+            double u1 = Math.Clamp(
+                (445 - k.X) / 207.0, 0, 1);
     
+            double v0 = Math.Clamp(
+                (247 - k.Y - k.H) / 77.0, 0, 1);
+            double v1 = Math.Clamp(
+                (247 - k.Y) / 77.0, 0, 1);
+    
+            Point a = ProjectKey(u0, v0,
+                farLeft, farRight, nearRight, nearLeft);
+            Point b = ProjectKey(u1, v0,
+                farLeft, farRight, nearRight, nearLeft);
+            Point c = ProjectKey(u1, v1,
+                farLeft, farRight, nearRight, nearLeft);
+            Point e = ProjectKey(u0, v1,
+                farLeft, farRight, nearRight, nearLeft);
+    
+            // 阴影向屏幕下方投射，不随键盘反转
             if (!held)
             {
-                RoundRect(d, "#D0B79D", null,
-                    k.X, y + 1.7,
-                    k.W, k.H, 3.2, 0);
+                DrawQuad(d, "#C7B09C", null,
+                    new Point(a.X, a.Y + 2),
+                    new Point(b.X, b.Y + 2),
+                    new Point(c.X, c.Y + 2),
+                    new Point(e.X, e.Y + 2));
             }
     
-            RoundRect(
-                d,
+            DrawQuad(d,
                 held ? "#F0B89C" : "#FFF9EF",
                 held ? "#B57258" : "#C6B4A5",
-                k.X, y, k.W, k.H, 3.2, 0.9
-            );
+                a, b, c, e);
     
-            double font = k.W > 28 ? 6.2 : 6.7;
+            // 字母保持正向，不倒立
+            Point center = ProjectKey(
+                (u0 + u1) / 2,
+                (v0 + v1) / 2,
+                farLeft, farRight, nearRight, nearLeft);
     
-            Label(
-                d,
-                k.Caption,
-                k.CenterX,
-                y + 1.2,
-                font,
-                held ? "#7D4C3A" : "#6F615A"
-            );
+            Label(d, k.Caption, center.X,
+                center.Y - 4, 6.2,
+                held ? "#7D4C3A" : "#6F615A");
         }
-    
-        d.Pop();
     }
-
     private void DrawBubu(DrawingContext d)
     {
         const string fur = "#D5A172";
@@ -195,6 +220,50 @@ internal sealed class SceneView : FrameworkElement
     private static Pen? Stroke(string? hex, double width) => hex is null ? null : new Pen(Ink(hex), width);
     private static void Ellipse(DrawingContext d, string fill, string? stroke, double x, double y, double rx, double ry, double width = 0) =>
         d.DrawEllipse(Ink(fill), Stroke(stroke, width), new Point(x, y), rx, ry);
+    
+    private static Point ProjectKey(
+        double u, double v,
+        Point a, Point b, Point c, Point e)
+    {
+        // 将平面坐标映射到倾斜四边形
+        return new Point(
+            (1-u)*(1-v)*a.X +
+            u*(1-v)*b.X +
+            u*v*c.X +
+            (1-u)*v*e.X,
+    
+            (1-u)*(1-v)*a.Y +
+            u*(1-v)*b.Y +
+            u*v*c.Y +
+            (1-u)*v*e.Y
+        );
+    }
+
+    private static void DrawQuad(
+        DrawingContext d,
+        string fill,
+        string? stroke,
+        Point a, Point b, Point c, Point e)
+    {
+        var geometry = new StreamGeometry();
+    
+        using (var ctx = geometry.Open())
+        {
+            ctx.BeginFigure(a, true, true);
+            ctx.LineTo(b, true, false);
+            ctx.LineTo(c, true, false);
+            ctx.LineTo(e, true, false);
+        }
+    
+        geometry.Freeze();
+    
+        d.DrawGeometry(
+            Ink(fill),
+            stroke == null ? null : Stroke(stroke, 1.2),
+            geometry
+        );
+    }
+    
     private static void RoundRect(DrawingContext d, string fill, string? stroke, double x, double y, double w, double h, double r, double width = 0) =>
         d.DrawRoundedRectangle(Ink(fill), Stroke(stroke, width), new Rect(x, y, w, h), r, r);
     private static void Line(DrawingContext d, string color, double width, double x1, double y1, double x2, double y2) =>
