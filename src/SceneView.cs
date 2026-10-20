@@ -41,34 +41,91 @@ internal sealed class SceneView : FrameworkElement
         Ellipse(d, "#16000000", null, 348, 231, 118, 14);
         Ellipse(d, "#12000000", null, 156, 214, 28, 8);
     }
+
     private void DrawMousePadAndMouse(DrawingContext d)
     {
-        RoundRect(d, "#F7D6CF", "#8A6A64", 88, 182, 86, 41, 10, 1.8);
+        // 将鼠标和鼠标垫整体旋转180°，朝向布布
+        d.PushTransform(new RotateTransform(180, 131, 201));
+    
+        RoundRect(d, "#F7D6CF", "#8A6A64",
+            88, 182, 86, 41, 10, 1.8);
+    
         double mx = 131 + Math.Clamp(MouseX, -1, 1) * 5.5;
         double my = 201 + Math.Clamp(MouseY, -1, 1) * 2.0;
-        Ellipse(d, "#FFF9F4", "#866B64", mx, my, 23, 31, 2.0);
-        Line(d, "#8A6F68", 1.4, mx, my - 23, mx, my + 1);
-        if (MouseLeft) Ellipse(d, "#F1BBB2", null, mx - 8, my - 5, 8, 10);
-        if (MouseRight) Ellipse(d, "#F1BBB2", null, mx + 8, my - 5, 8, 10);
+    
+        Ellipse(d, "#FFF9F4", "#866B64",
+            mx, my, 23, 31, 2.0);
+    
+        Line(d, "#8A6F68", 1.4,
+            mx, my - 23, mx, my + 1);
+    
+        if (MouseLeft)
+            Ellipse(d, "#F1BBB2", null,
+                mx - 8, my - 5, 8, 10);
+    
+        if (MouseRight)
+            Ellipse(d, "#F1BBB2", null,
+                mx + 8, my - 5, 8, 10);
+    
         if (!MouseLeft && !MouseRight && MousePulse > 0.05)
-            Ellipse(d, "#18D9A8A0", null, mx, my + 11, 14 + 5 * MousePulse, 6 + 2 * MousePulse);
+            Ellipse(d, "#18D9A8A0", null,
+                mx, my + 11,
+                14 + 5 * MousePulse,
+                6 + 2 * MousePulse);
+    
+        d.Pop();
     }
+
     private void DrawKeyboard(DrawingContext d)
     {
-        // keyboard deck
-        RoundRect(d, "#F8F1E7", "#8D8177", 226, 167, 228, 82, 15, 2.0);
-        RoundRect(d, "#EFE5DA", null, 233, 172, 214, 69, 13, 0);
+        // 绕键盘中心旋转180°
+        // 键盘、键帽、按键高亮同步旋转
+        d.PushTransform(new RotateTransform(180, 340, 208));
+    
+        RoundRect(d, "#F8F1E7", "#8D8177",
+            226, 167, 228, 82, 15, 2.0);
+    
+        RoundRect(d, "#EFE5DA", null,
+            233, 172, 214, 69, 13, 0);
+    
         foreach (var k in KeyboardLayout.Keys)
         {
-            bool held = HeldKeys.Contains(k.Vk) || (k.Vk == 160 && HeldKeys.Contains(16)) || (k.Vk == 161 && HeldKeys.Contains(16));
+            bool held =
+                HeldKeys.Contains(k.Vk) ||
+                (k.Vk == 160 && HeldKeys.Contains(16)) ||
+                (k.Vk == 161 && HeldKeys.Contains(16));
+    
             double y = k.Y + (held ? 1.8 : 0);
+    
             if (!held)
-                RoundRect(d, "#D0B79D", null, k.X, y + 1.7, k.W, k.H, 3.2, 0);
-            RoundRect(d, held ? "#F0B89C" : "#FFF9EF", held ? "#B57258" : "#C6B4A5", k.X, y, k.W, k.H, 3.2, 0.9);
-            var font = k.W > 28 ? 6.2 : 6.7;
-            Label(d, k.Caption, k.CenterX, y + 1.2, font, held ? "#7D4C3A" : "#6F615A");
+            {
+                RoundRect(d, "#D0B79D", null,
+                    k.X, y + 1.7,
+                    k.W, k.H, 3.2, 0);
+            }
+    
+            RoundRect(
+                d,
+                held ? "#F0B89C" : "#FFF9EF",
+                held ? "#B57258" : "#C6B4A5",
+                k.X, y, k.W, k.H, 3.2, 0.9
+            );
+    
+            double font = k.W > 28 ? 6.2 : 6.7;
+    
+            Label(
+                d,
+                k.Caption,
+                k.CenterX,
+                y + 1.2,
+                font,
+                held ? "#7D4C3A" : "#6F615A"
+            );
         }
+    
+        d.Pop();
     }
+
     private void DrawBubu(DrawingContext d)
     {
         const string fur = "#D5A172";
