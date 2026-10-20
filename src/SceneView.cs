@@ -41,15 +41,15 @@ internal sealed class SceneView : FrameworkElement
         
         DrawShadows(d);
         
+        // 后景：人物
+        d.DrawImage(BubuImage, new Rect(140, 48, 122, 125));
+        d.DrawImage(YierImage, new Rect(250, 86, 148, 151));
+        
         // 中景：鼠标和键盘整体绕画面中心顺时针旋转30°
         d.PushTransform(new RotateTransform(10, BaseW / 2, BaseH / 2));
         DrawMousePadAndMouse(d);
         DrawKeyboard(d);
         d.Pop();
-
-        // 后景：人物
-        d.DrawImage(BubuImage, new Rect(140, 48, 122, 125));
-        d.DrawImage(YierImage, new Rect(250, 86, 148, 151));
         
         // 前景：桌面边缘线
         // DrawDeskFrame(d);
