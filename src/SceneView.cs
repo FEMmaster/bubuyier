@@ -42,8 +42,8 @@ internal sealed class SceneView : FrameworkElement
         DrawShadows(d);
         // Character PNGs are behind the foreground desk devices.
         // The original character paws are part of the image in this preview.
-        d.DrawImage(BubuImage, new Rect(100, 74, 138, 142));
-        d.DrawImage(YierImage, new Rect(308, 76, 140, 143));
+        d.DrawImage(BubuImage, new Rect(82, 48, 122, 125));
+        d.DrawImage(YierImage, new Rect(314, 86, 148, 151));
         DrawMousePadAndMouse(d);
         DrawKeyboard(d);
         DrawDeskFrame(d);
@@ -66,7 +66,10 @@ internal sealed class SceneView : FrameworkElement
 
     private void DrawMousePadAndMouse(DrawingContext d)
     {
-        d.PushTransform(new TranslateTransform(58, 3));
+        var tg = new TransformGroup();
+        tg.Children.Add(new ScaleTransform(0.88, 0.88, 127, 203));
+        tg.Children.Add(new TranslateTransform(44, -18));
+        d.PushTransform(tg);
         DrawQuad(d, "#F7D6CF", "#8A6A64",
             new Point(101, 183), new Point(158, 194),
             new Point(178, 224), new Point(77, 211));
