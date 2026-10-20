@@ -48,8 +48,27 @@ internal sealed class SceneView : FrameworkElement
         d.Pop();
       
         // 后景：人物
-        d.DrawImage(BubuImage, new Rect(140, 48, 122, 125));
-        d.DrawImage(YierImage, new Rect(250, 40, 148, 151));
+        // 布布：绕自身中心顺时针旋转 10 度
+        {
+            Rect bubuRect = new Rect(82, 48, 122, 125);
+            d.PushTransform(new RotateTransform(
+                10,
+                bubuRect.X + bubuRect.Width / 2,
+                bubuRect.Y + bubuRect.Height / 2));
+            d.DrawImage(BubuImage, bubuRect);
+            d.Pop();
+        }
+        
+        // 一二：绕自身中心顺时针旋转 10 度
+        {
+            Rect yierRect = new Rect(314, 86, 148, 151);
+            d.PushTransform(new RotateTransform(
+                10,
+                yierRect.X + yierRect.Width / 2,
+                yierRect.Y + yierRect.Height / 2));
+            d.DrawImage(YierImage, yierRect);
+            d.Pop();
+        }
         
         // 前景：桌面边缘线
         // DrawDeskFrame(d);
