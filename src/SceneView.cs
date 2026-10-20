@@ -49,7 +49,7 @@ internal sealed class SceneView : FrameworkElement
       
         // 后景：人物
         d.DrawImage(BubuImage, new Rect(140, 48, 122, 125));
-        d.DrawImage(YierImage, new Rect(250, 186, 148, 151));
+        d.DrawImage(YierImage, new Rect(250, 40, 148, 151));
         
         // 前景：桌面边缘线
         // DrawDeskFrame(d);
