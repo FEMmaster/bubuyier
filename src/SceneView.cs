@@ -52,7 +52,7 @@ internal sealed class SceneView : FrameworkElement
         d.Pop();
         
         // 前景：桌面边缘线
-        DrawDeskFrame(d);
+        // DrawDeskFrame(d);
         
         d.Pop();
     }
