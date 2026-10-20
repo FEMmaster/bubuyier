@@ -23,10 +23,18 @@ internal sealed class SceneView : FrameworkElement
         d.PushTransform(new ScaleTransform(ActualWidth / BaseW, ActualHeight / BaseH));
         DrawDeskFrame(d);
         DrawShadows(d);
+        
+        // 后景：两只角色的头部和身体
+        DrawBubuBody(d);
+        DrawYierBody(d);
+        
+        // 中景：鼠标垫、鼠标和键盘
         DrawMousePadAndMouse(d);
         DrawKeyboard(d);
-        DrawBubu(d);
-        DrawYier(d);
+        
+        // 前景：伸到设备上的爪子
+        DrawBubuPaws(d);
+        DrawYierPaws(d);
         d.Pop();
     }
     private void DrawDeskFrame(DrawingContext d)
